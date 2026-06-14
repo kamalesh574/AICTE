@@ -45,6 +45,9 @@ if 'chat_history' not in st.session_state:
 if 'completed_workouts' not in st.session_state:
     st.session_state['completed_workouts'] = set()
 
+if 'current_page' not in st.session_state:
+    st.session_state['current_page'] = "⚙️ Update Profile"
+
 # --- Sidebar Navigation & Settings ---
 with st.sidebar:
     st.title("⚡ AuraFit AI")
@@ -52,7 +55,19 @@ with st.sidebar:
     st.divider()
     
     # Navigation
-    page = st.radio("Navigation", ["📊 Dashboard", "🏋️ Workout Planner", "🥗 Diet & Budget", "💬 AI Coach", "⚙️ Update Profile"], key="nav_radio")
+    nav_options = ["📊 Dashboard", "🏋️ Workout Planner", "🥗 Diet & Budget", "💬 AI Coach", "⚙️ Update Profile"]
+    
+    # Check if current_page is valid
+    if st.session_state['current_page'] not in nav_options:
+        st.session_state['current_page'] = "⚙️ Update Profile"
+        
+    current_idx = nav_options.index(st.session_state['current_page'])
+    page = st.radio("Navigation", nav_options, index=current_idx)
+    
+    # Update the state if the user manually clicks the radio
+    if page != st.session_state['current_page']:
+        st.session_state['current_page'] = page
+        st.rerun()
     
     st.divider()
     st.markdown("### User Info")
@@ -81,7 +96,7 @@ if page == "⚙️ Update Profile" or not st.session_state['plan_generated']:
             st.session_state['user_plan'] = ml_engine.get_recommendation(user_profile)
             st.session_state['plan_generated'] = True
             st.session_state['completed_workouts'] = set()
-            st.session_state['nav_radio'] = "📊 Dashboard"
+            st.session_state['current_page'] = "📊 Dashboard"
             st.rerun()
 
 # --- Ensure Plan Exists before rendering other pages ---
