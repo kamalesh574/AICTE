@@ -52,7 +52,7 @@ with st.sidebar:
     st.divider()
     
     # Navigation
-    page = st.radio("Navigation", ["📊 Dashboard", "🏋️ Workout Planner", "🥗 Diet & Budget", "💬 AI Coach", "⚙️ Update Profile"])
+    page = st.radio("Navigation", ["📊 Dashboard", "🏋️ Workout Planner", "🥗 Diet & Budget", "💬 AI Coach", "⚙️ Update Profile"], key="nav_radio")
     
     st.divider()
     st.markdown("### User Info")
@@ -81,7 +81,8 @@ if page == "⚙️ Update Profile" or not st.session_state['plan_generated']:
             st.session_state['user_plan'] = ml_engine.get_recommendation(user_profile)
             st.session_state['plan_generated'] = True
             st.session_state['completed_workouts'] = set()
-            st.success("Plan updated successfully! Go to the Dashboard to view it.")
+            st.session_state['nav_radio'] = "📊 Dashboard"
+            st.rerun()
 
 # --- Ensure Plan Exists before rendering other pages ---
 elif st.session_state['plan_generated'] and st.session_state['user_plan']:
