@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraFit AI - Personalized Student Workout & Diet Planner</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Fullscreen Glass Loader -->
+    <div id="app-loader" class="loader-container hidden">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <h3 id="loader-title">AI is analyzing your profile...</h3>
+            <p id="loader-subtitle">Crafting budget-friendly diet & workout plans tailored for you.</p>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-grid">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-area">
+                    <div class="logo-icon">
+                        <i data-lucide="zap"></i>
+                    </div>
+                    <div>
+                        <span class="logo-title">AuraFit <span class="logo-accent">AI</span></span>
+                        <span class="logo-tagline">Student Fitness Hub</span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-tab="dashboard" id="nav-dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-btn" data-tab="workout" id="nav-workout">
+                    <i data-lucide="dumbbell"></i>
+                    <span>Workout Planner</span>
+                </button>
+                <button class="nav-btn" data-tab="diet" id="nav-diet">
+                    <i data-lucide="utensils"></i>
+                    <span>Diet & Budget Hub</span>
+                </button>
+                <button class="nav-btn" data-tab="chat" id="nav-chat">
+                    <i data-lucide="message-square-code"></i>
+                    <span>AI Fitness Coach</span>
+                </button>
+                <button class="nav-btn" data-tab="analytics" id="nav-analytics">
+                    <i data-lucide="line-chart"></i>
+                    <span>Analytics</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="profile-card-btn" id="btn-re-profile">
+                    <div class="user-avatar">
+                        <i data-lucide="user"></i>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name" id="profile-user-name">Guest Student</span>
+                        <span class="user-status" id="profile-user-goal">Goal Unset</span>
+                    </div>
+                    <i data-lucide="settings-2" class="settings-gear"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-welcome">
+                    <h1 id="header-greeting">Hello, Student Athlete!</h1>
+                    <p id="header-date">Today is Sunday, June 14, 2026</p>
+                </div>
+                <div class="header-actions">
+                    <button class="accent-btn" id="btn-quick-generate">
+                        <i data-lucide="sparkles"></i>
+                        <span>AI Re-Plan</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Onboarding Panel / Modal View (Absolute / Full-screen overlap) -->
+            <section id="panel-onboarding" class="panel-view onboarding-panel active">
+                <div class="onboarding-card">
+                    <div class="onboarding-header">
+                        <h2>Personalize Your AI Fitness Plan</h2>
+                        <p>We optimize recipes, budgets, and routines for student schedules & resources.</p>
+                        <div class="step-indicator">
+                            <span class="step dot active" data-step="1"></span>
+                            <span class="step dot" data-step="2"></span>
+                            <span class="step dot" data-step="3"></span>
+                        </div>
+                    </div>
+
+                    <form id="onboarding-form" onsubmit="return false;">
+                        <!-- Step 1: Basics -->
+                        <div class="form-step active" data-step="1">
+                            <h3 class="step-title"><i data-lucide="user"></i> About You</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="input-name">First Name</label>
+                                    <input type="text" id="input-name" placeholder="Kamalesh" required value="Kamalesh">
+                                </div>
+                                <div class="form-group">
+                                    <label for="select-gender">Gender Identity</label>
+                                    <select id="select-gender">
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="nonbinary">Non-binary</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-age">Age (Years)</label>
+                                    <input type="number" id="input-age" value="20" min="15" max="60" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-weight">Weight (kg)</label>
+                                    <input type="number" id="input-weight" value="70" min="30" max="200" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-height">Height (cm)</label>
+                                    <input type="number" id="input-height" value="175" min="100" max="250" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="select-goal">Primary Goal</label>
+                                    <select id="select-goal">
+                                        <option value="lean-muscle">Lean Muscle Gain</option>
+                                        <option value="weight-loss">Weight Loss & Cut</option>
+                                        <option value="endurance">Build Endurance</option>
+                                        <option value="stay-fit">Stay Fit & Active</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="step-actions">
+                                <button type="button" class="btn-next secondary-btn">Next: Constraints <i data-lucide="arrow-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Student Constraints -->
+                        <div class="form-step" data-step="2">
+                            <h3 class="step-title"><i data-lucide="wallet"></i> Student Budget & Equipment</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="select-budget">Daily Food Budget</label>
+                                    <select id="select-budget">
+                                        <option value="budget-tight">Ultra Saver (Hostel / DIY, cheap protein)</option>
+                                        <option value="budget-moderate" selected>Moderate (Simple groceries, standard diet)</option>
+                                        <option value="budget-flexible">Flexible (Allows protein shakes, premium ingredients)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="select-equipment">Workout Equipment</label>
+                                    <select id="select-equipment">
+                                        <option value="bodyweight">No Equipment (Dorm room / Calisthenics)</option>
+                                        <option value="bands">Resistance Bands only</option>
+                                        <option value="dumbbells">Dumbbells only</option>
+                                        <option value="full-gym" selected>Full Gym Access</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="select-kitchen">Kitchen Access</label>
+                                    <select id="select-kitchen">
+                                        <option value="microwave-only">Microwave & Kettle only</option>
+                                        <option value="shared-kitchen" selected>Induction Cooktop / Shared Kitchen</option>
+                                        <option value="full-kitchen">Full Kitchen (Stove, Oven, Fridge)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="select-time">Daily Workout Time</label>
+                                    <select id="select-time">
+                                        <option value="15-min">Express (15 mins)</option>
+                                        <option value="30-min" selected>Standard (30 mins)</option>
+                                        <option value="60-min">Deep Session (60 mins)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="step-actions">
+                                <button type="button" class="btn-prev tertiary-btn"><i data-lucide="arrow-left"></i> Back</button>
+                                <button type="button" class="btn-next secondary-btn">Next: Diet Habits <i data-lucide="arrow-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Diet & Culture -->
+                        <div class="form-step" data-step="3">
+                            <h3 class="step-title"><i data-lucide="soup"></i> Dietary Preferences & Habits</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="select-cuisine">Cultural Food Pattern</label>
+                                    <select id="select-cuisine">
+                                        <option value="indian-veg">Indian Vegetarian (Lentils, Paneer, Rice, Roti)</option>
+                                        <option value="indian-nonveg">Indian Non-Vegetarian (Chicken, Eggs, Spices)</option>
+                                        <option value="mediterranean">Mediterranean (Olive oil, Fish, Grains)</option>
+                                        <option value="western-standard">Western / College Standard (Oats, Eggs, Chicken, Rice)</option>
+                                        <option value="vegan">Vegan / Plant-Based</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-allergies">Allergies / Restrictions (Optional)</label>
+                                    <input type="text" id="input-allergies" placeholder="Peanuts, Lactose intolerant, Gluten-free">
+                                </div>
+                                <div class="form-group">
+                                    <label for="select-activity">Lifestyle Activity Level</label>
+                                    <select id="select-activity">
+                                        <option value="sedentary">Sedentary (Mostly studying / desk work)</option>
+                                        <option value="lightly-active" selected>Lightly Active (Walking between classes)</option>
+                                        <option value="moderately-active">Moderately Active (Daily walks / active sports)</option>
+                                        <option value="very-active">Very Active (Heavy workouts / sports)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="step-actions">
+                                <button type="button" class="btn-prev tertiary-btn"><i data-lucide="arrow-left"></i> Back</button>
+                                <button type="submit" class="accent-btn" id="btn-submit-profile">
+                                    <i data-lucide="sparkles"></i>
+                                    <span>Generate AI Plan</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Dashboard View -->
+            <section id="panel-dashboard" class="panel-view">
+                <!-- Top Highlights Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card glass">
+                        <div class="metric-header">
+                            <span>Daily Energy Goal</span>
+                            <div class="metric-icon accent-purple"><i data-lucide="flame"></i></div>
+                        </div>
+                        <div class="metric-value"><span id="dash-cal-target">2,200</span> <span class="unit">kcal</span></div>
+                        <div class="metric-progress-bar">
+                            <div class="bar-fill" id="dash-cal-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="metric-footer">
+                            <span id="dash-cal-status">0 kcal consumed today</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card glass">
+                        <div class="metric-header">
+                            <span>Protein Intake</span>
+                            <div class="metric-icon accent-blue"><i data-lucide="beef"></i></div>
+                        </div>
+                        <div class="metric-value"><span id="dash-protein-target">120</span> <span class="unit">g</span></div>
+                        <div class="metric-progress-bar">
+                            <div class="bar-fill blue-fill" id="dash-protein-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="metric-footer">
+                            <span id="dash-protein-status">0g logged</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card glass">
+                        <div class="metric-header">
+                            <span>Workout Routine</span>
+                            <div class="metric-icon accent-green"><i data-lucide="dumbbell"></i></div>
+                        </div>
+                        <div class="metric-value text-truncate" id="dash-workout-name">Rest Day</div>
+                        <div class="metric-progress-bar">
+                            <div class="bar-fill green-fill" id="dash-workout-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="metric-footer">
+                            <span id="dash-workout-status">No exercise logged</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card glass">
+                        <div class="metric-header">
+                            <span>Daily Food Cost</span>
+                            <div class="metric-icon accent-yellow"><i data-lucide="indian-rupee"></i></div>
+                        </div>
+                        <div class="metric-value" id="dash-budget-value">₹180 <span class="unit">/ day</span></div>
+                        <div class="metric-progress-bar">
+                            <div class="bar-fill yellow-fill" style="width: 100%"></div>
+                        </div>
+                        <div class="metric-footer">
+                            <span class="text-success"><i data-lucide="check-circle" class="small-icon"></i> Fits in Saver budget</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Sections -->
+                <div class="layout-dual-grid">
+                    <!-- Left: Day Plan & Loggers -->
+                    <div class="dashboard-left flex-column-gap">
+                        <!-- Today's Schedule Overview -->
+                        <div class="content-card glass">
+                            <div class="card-header">
+                                <h3><i data-lucide="calendar-check"></i> Today's Schedule</h3>
+                                <button class="action-text-btn" id="btn-view-workout-tab">Full Workout <i data-lucide="arrow-right"></i></button>
+                            </div>
+                            <div class="schedule-timeline">
+                                <div class="timeline-item">
+                                    <div class="time-marker">Morning</div>
+                                    <div class="timeline-content card-interactive" id="dash-sched-breakfast">
+                                        <div class="schedule-title">Meal 1: High Protein Breakfast</div>
+                                        <p class="schedule-desc" id="dash-breakfast-desc">Loading plan...</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="time-marker">Noon</div>
+                                    <div class="timeline-content card-interactive" id="dash-sched-lunch">
+                                        <div class="schedule-title">Meal 2: Budget-Friendly Lunch</div>
+                                        <p class="schedule-desc" id="dash-lunch-desc">Loading plan...</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="time-marker">Evening</div>
+                                    <div class="timeline-content card-interactive highlight-border" id="dash-sched-workout">
+                                        <div class="schedule-title"><i data-lucide="dumbbell" class="inline-icon"></i> AI Customized Workout</div>
+                                        <p class="schedule-desc" id="dash-workout-desc">Loading plan...</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="time-marker">Night</div>
+                                    <div class="timeline-content card-interactive" id="dash-sched-dinner">
+                                        <div class="schedule-title">Meal 3: Easy Cook Dinner</div>
+                                        <p class="schedule-desc" id="dash-dinner-desc">Loading plan...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hydration Tracker -->
+                        <div class="content-card glass">
+                            <div class="card-header">
+                                <h3><i data-lucide="droplet" class="text-blue"></i> Water Intake Tracker</h3>
+                                <span class="badge" id="hydration-count">0 / 8 Glasses</span>
+                            </div>
+                            <div class="hydration-widget">
+                                <div class="cups-grid" id="cups-container">
+                                    <button class="cup-btn" data-index="0"><i data-lucide="droplet"></i></button>
+                                    <button class="cup-btn" data-index="1"><i data-lucide="droplet"></i></button>
+                                    <button class="cup-btn" data-index="2"><i data-lucide="droplet"></i></button>
+                                    <button class="cup-btn" data-index="3"><i data-lucide="droplet"></i></button>
+                                    <button class="cup-btn" data-index="4"><i data-lucide="droplet"></i></button>
+                                    <button class="cup-btn" data-index="5"><i data-lucide="droplet"></i></button>
+                                    <button class="cup-btn" data-index="6"><i data-lucide="droplet"></i></button>
+                                    <button class="cup-btn" data-index="7"><i data-lucide="droplet"></i></button>
+                                </div>
+                                <div class="water-actions">
+                                    <button class="secondary-btn btn-sm" id="btn-add-water">+ Add 1 Glass (250ml)</button>
+                                    <button class="tertiary-btn btn-sm" id="btn-reset-water">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Quick Coach & Student Tips -->
+                    <div class="dashboard-right flex-column-gap">
+                        <!-- AI Coach Mini Chat widget -->
+                        <div class="content-card glass flex-fill flex-column">
+                            <div class="card-header">
+                                <div class="card-title-combo">
+                                    <h3><i data-lucide="bot" class="text-purple"></i> Ask AI Coach</h3>
+                                    <span class="pulse-indicator">Online</span>
+                                </div>
+                                <button class="action-text-btn" id="btn-view-chat-tab">Expand <i data-lucide="maximize-2"></i></button>
+                            </div>
+                            <div class="chat-preview-box" id="mini-chat-display">
+                                <div class="chat-message coach-message">
+                                    👋 Hi! I'm your AuraFit Coach. Based on your student setup, I've optimized your budget and workouts. Got questions? Try: "How can I swap my dinner for a cheaper alternative?" or "Give me a quick 10 min warm up."
+                                </div>
+                            </div>
+                            <div class="chat-input-area">
+                                <input type="text" id="mini-chat-input" placeholder="Ask AI Coach for changes...">
+                                <button class="icon-send-btn" id="btn-mini-chat-send"><i data-lucide="send"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Budget Student Meal Hack -->
+                        <div class="content-card glass accent-card-border">
+                            <div class="card-header">
+                                <h3><i data-lucide="piggy-bank" class="text-yellow"></i> Student Budget Saving Tips</h3>
+                            </div>
+                            <div class="tips-container">
+                                <div class="tip-item">
+                                    <span class="tip-icon"><i data-lucide="arrow-up-right"></i></span>
+                                    <div>
+                                        <h4 class="tip-title">Smart Protein Swap</h4>
+                                        <p class="tip-desc">Buy dried soy chunks (nuggets) or whole chickpeas in bulk. They offer 50g+ protein per ₹25, much cheaper than supplements.</p>
+                                    </div>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon"><i data-lucide="utensils-crosskey"></i></span>
+                                    <div>
+                                        <h4 class="tip-title">Microwave Egg Mug Hack</h4>
+                                        <p class="tip-desc">Beat 2 eggs in a mug with salt, pepper, and chopped spinach. Microwave for 90 seconds for a quick, no-pan clean high-protein breakfast.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Workout View -->
+            <section id="panel-workout" class="panel-view">
+                <div class="layout-dual-grid">
+                    <!-- Left: Exercise Checklist -->
+                    <div class="workout-left-panel">
+                        <div class="content-card glass">
+                            <div class="card-header border-bottom">
+                                <div>
+                                    <h3 id="workout-routine-title">AI Selected Workout Routine</h3>
+                                    <p id="workout-routine-subtitle" class="card-subtitle">Gym Access - Standard Duration</p>
+                                </div>
+                                <span class="badge" id="workout-progress-badge">0 / 5 Done</span>
+                            </div>
+                            <div class="exercise-list-container" id="exercises-list">
+                                <!-- Populated dynamically by JS -->
+                                <div class="exercise-item">
+                                    <div class="exercise-checkbox-wrapper">
+                                        <input type="checkbox" class="exercise-checkbox">
+                                    </div>
+                                    <div class="exercise-details">
+                                        <h4>Pushups</h4>
+                                        <p>3 sets x 15 reps • Target: Chest & Triceps</p>
+                                    </div>
+                                    <button class="exercise-action-btn" title="View Animation/Instructions"><i data-lucide="info"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Active Timer & Animation/Illustration -->
+                    <div class="workout-right-panel flex-column-gap">
+                        <div class="content-card glass active-workout-card">
+                            <div class="card-header">
+                                <h3><i data-lucide="timer" class="text-green"></i> Rest & Session Timer</h3>
+                                <button class="secondary-btn btn-sm" id="btn-toggle-voice"><i data-lucide="volume-2" id="voice-icon"></i> Voice Assist</button>
+                            </div>
+                            <div class="timer-display-area">
+                                <svg class="timer-svg" viewBox="0 0 200 200">
+                                    <circle class="timer-track-circle" cx="100" cy="100" r="80" />
+                                    <circle class="timer-fill-circle" id="timer-arc" cx="100" cy="100" r="80" />
+                                </svg>
+                                <div class="timer-text-container">
+                                    <span class="timer-seconds" id="timer-time-display">00:45</span>
+                                    <span class="timer-label" id="timer-label-display">REST SECONDS</span>
+                                </div>
+                            </div>
+                            <div class="timer-controls">
+                                <button class="tertiary-btn btn-icon-round" id="btn-timer-reset" title="Reset Timer"><i data-lucide="rotate-ccw"></i></button>
+                                <button class="accent-btn btn-icon-round-large" id="btn-timer-play" title="Play/Pause"><i data-lucide="play" id="play-icon"></i></button>
+                                <button class="secondary-btn btn-icon-round" id="btn-timer-skip" title="Skip Timer"><i data-lucide="skip-forward"></i></button>
+                            </div>
+                            <div class="exercise-guide-panel" id="exercise-guide-panel">
+                                <h4 id="guide-exercise-title">Exercise: Warm Up Jog</h4>
+                                <p id="guide-exercise-text">Perform light movements to prepare your muscles. Press Play on the timer to track active blocks or rest periods.</p>
+                            </div>
+                        </div>
+
+                        <!-- Progress Summary -->
+                        <div class="content-card glass">
+                            <h3><i data-lucide="award" class="text-yellow"></i> Weekly Workout Consistency</h3>
+                            <div class="weekly-streak-container">
+                                <div class="day-dot completed" data-day="Mon"><span>M</span><i data-lucide="check" class="check-icon"></i></div>
+                                <div class="day-dot completed" data-day="Tue"><span>T</span><i data-lucide="check" class="check-icon"></i></div>
+                                <div class="day-dot active" data-day="Wed"><span>W</span><i data-lucide="circle" class="check-icon"></i></div>
+                                <div class="day-dot" data-day="Thu"><span>T</span><i data-lucide="circle" class="check-icon"></i></div>
+                                <div class="day-dot" data-day="Fri"><span>F</span><i data-lucide="circle" class="check-icon"></i></div>
+                                <div class="day-dot" data-day="Sat"><span>S</span><i data-lucide="circle" class="check-icon"></i></div>
+                                <div class="day-dot" data-day="Sun"><span>S</span><i data-lucide="circle" class="check-icon"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diet & Budget View -->
+            <section id="panel-diet" class="panel-view">
+                <!-- Macronutrient Overview -->
+                <div class="diet-nutrition-summary glass">
+                    <div class="nutrition-header">
+                        <div>
+                            <h3>Daily Macronutrient Goal</h3>
+                            <p class="card-subtitle">AI calculated based on your budget & fitness objectives</p>
+                        </div>
+                        <div class="nutrition-summary-total">
+                            <span id="nutrition-total-cals">2,200</span> <span class="unit">kcal</span>
+                        </div>
+                    </div>
+                    <div class="macros-flex-container">
+                        <div class="macro-circle-widget">
+                            <svg class="macro-svg" viewBox="0 0 100 100">
+                                <circle class="macro-track" cx="50" cy="50" r="40" />
+                                <circle class="macro-fill stroke-purple" id="macro-protein-arc" cx="50" cy="50" r="40" />
+                            </svg>
+                            <div class="macro-circle-text">
+                                <span class="macro-value" id="diet-protein-val">0g</span>
+                                <span class="macro-lbl" id="diet-protein-target-lbl">of 130g</span>
+                                <span class="macro-name">PROTEIN</span>
+                            </div>
+                        </div>
+                        <div class="macro-circle-widget">
+                            <svg class="macro-svg" viewBox="0 0 100 100">
+                                <circle class="macro-track" cx="50" cy="50" r="40" />
+                                <circle class="macro-fill stroke-blue" id="macro-carbs-arc" cx="50" cy="50" r="40" />
+                            </svg>
+                            <div class="macro-circle-text">
+                                <span class="macro-value" id="diet-carbs-val">0g</span>
+                                <span class="macro-lbl" id="diet-carbs-target-lbl">of 250g</span>
+                                <span class="macro-name">CARBS</span>
+                            </div>
+                        </div>
+                        <div class="macro-circle-widget">
+                            <svg class="macro-svg" viewBox="0 0 100 100">
+                                <circle class="macro-track" cx="50" cy="50" r="40" />
+                                <circle class="macro-fill stroke-yellow" id="macro-fats-arc" cx="50" cy="50" r="40" />
+                            </svg>
+                            <div class="macro-circle-text">
+                                <span class="macro-value" id="diet-fats-val">0g</span>
+                                <span class="macro-lbl" id="diet-fats-target-lbl">of 65g</span>
+                                <span class="macro-name">FATS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layout-dual-grid">
+                    <!-- Left: Meal List with logger controls -->
+                    <div class="diet-meals-panel">
+                        <div class="content-card glass">
+                            <div class="card-header border-bottom">
+                                <h3><i data-lucide="utensils" class="text-purple"></i> Daily Meal Plan</h3>
+                                <button class="secondary-btn btn-sm" id="btn-reset-meals"><i data-lucide="rotate-ccw"></i> Reset Meal Logs</button>
+                            </div>
+                            <div class="meals-list" id="meals-list-container">
+                                <!-- Populated dynamically by JS -->
+                                <div class="meal-item glass">
+                                    <div class="meal-header">
+                                        <span class="meal-type">Breakfast</span>
+                                        <div class="meal-macros">380 kcal • 24g Protein</div>
+                                    </div>
+                                    <h4 class="meal-title">Masala Scrambled Paneer & Oats</h4>
+                                    <p class="meal-ingredients">Ingredients: Oats, Paneer (or tofu), Turmeric, Green Chillies.</p>
+                                    <div class="meal-cooking-tips">
+                                        <strong><i data-lucide="cooking-pot" class="inline-icon"></i> Prep (Induction Cooktop):</strong> Dry roast oats. Stir-fry paneer with spices, combine and cook with water.
+                                    </div>
+                                    <div class="meal-footer">
+                                        <button class="accent-btn btn-sm btn-log-meal">Log Meal</button>
+                                        <button class="secondary-btn btn-sm btn-swap-meal"><i data-lucide="refresh-cw"></i> Swap Meal</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Grocery List & Cost Calculator -->
+                    <div class="diet-budget-panel flex-column-gap">
+                        <div class="content-card glass">
+                            <div class="card-header border-bottom">
+                                <div>
+                                    <h3><i data-lucide="shopping-cart" class="text-green"></i> AI Grocery List</h3>
+                                    <p class="card-subtitle">Aggregated list optimized for budget</p>
+                                </div>
+                                <span class="badge" id="grocery-cost-badge">Est: ₹180</span>
+                            </div>
+                            <div class="grocery-list-checklist" id="grocery-checklist">
+                                <!-- Populated dynamically by JS -->
+                                <div class="grocery-item">
+                                    <div class="grocery-left">
+                                        <input type="checkbox" class="grocery-checkbox" id="g-item-1">
+                                        <label for="g-item-1">Rolled Oats (1kg)</label>
+                                    </div>
+                                    <span class="grocery-price">₹80</span>
+                                </div>
+                            </div>
+                            <div class="grocery-actions">
+                                <button class="secondary-btn btn-sm w-full" id="btn-add-grocery-item"><i data-lucide="plus"></i> Add Custom Item</button>
+                            </div>
+                        </div>
+
+                        <!-- Budget Swap Assist Widget -->
+                        <div class="content-card glass border-yellow">
+                            <div class="card-header">
+                                <h3><i data-lucide="lightbulb" class="text-yellow"></i> AI Budget Swaps</h3>
+                            </div>
+                            <div class="swaps-container" id="budget-swaps-box">
+                                <div class="swap-comparison">
+                                    <div class="original-item">
+                                        <span class="lbl-small red-text">Expensive Alternative</span>
+                                        <strong>Whey Protein Powder</strong>
+                                        <span class="price-desc">₹160 per serving (approx. 24g protein)</span>
+                                    </div>
+                                    <div class="swap-arrow"><i data-lucide="arrow-right"></i></div>
+                                    <div class="swapped-item">
+                                        <span class="lbl-small green-text">AI Budget Swap</span>
+                                        <strong>Sattu Powder or Soy Chunks</strong>
+                                        <span class="price-desc">₹15 per serving (approx. 25g protein)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Fitness Coach Chat View -->
+            <section id="panel-chat" class="panel-view">
+                <div class="chat-layout-grid">
+                    <!-- Left Sidebar: Sample Prompt Shortcuts -->
+                    <div class="chat-shortcuts-panel">
+                        <div class="content-card glass">
+                            <h3><i data-lucide="zap" class="text-purple"></i> Quick Coach Commands</h3>
+                            <p class="card-subtitle">Click to ask the AI coach to update your plans instantly</p>
+                            <div class="shortcuts-buttons-list">
+                                <button class="shortcut-btn-item" data-prompt="Swap dinner for a meal under ₹30.">
+                                    <i data-lucide="piggy-bank"></i>
+                                    <span>Make Dinner Cheaper (Under ₹30)</span>
+                                </button>
+                                <button class="shortcut-btn-item" data-prompt="I only have 15 minutes today. Shorten my workout.">
+                                    <i data-lucide="timer"></i>
+                                    <span>Shorten Workout (15m limit)</span>
+                                </button>
+                                <button class="shortcut-btn-item" data-prompt="Show me how to cook breakfast in a microwave.">
+                                    <i data-lucide="microwave"></i>
+                                    <span>Breakfast Microwave Guide</span>
+                                </button>
+                                <button class="shortcut-btn-item" data-prompt="I feel lazy today. What is a good substitute workout?">
+                                    <i data-lucide="battery-low"></i>
+                                    <span>Substitute workout for low energy</span>
+                                </button>
+                                <button class="shortcut-btn-item" data-prompt="Add more protein to my lunch plan.">
+                                    <i data-lucide="plus-circle"></i>
+                                    <span>Add More Protein to Lunch</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Full Message Thread -->
+                    <div class="chat-thread-panel content-card glass flex-column">
+                        <div class="chat-thread-header border-bottom">
+                            <div class="coach-meta-info">
+                                <div class="coach-avatar-large">
+                                    <i data-lucide="bot"></i>
+                                </div>
+                                <div>
+                                    <h3>AuraFit AI Coach</h3>
+                                    <p class="card-subtitle">Trained in Student Budgeting & Adaptive Exercise Sciences</p>
+                                </div>
+                            </div>
+                            <button class="secondary-btn btn-sm" id="btn-clear-chat"><i data-lucide="trash-2"></i> Clear History</button>
+                        </div>
+                        <div class="chat-messages-container" id="chat-thread-messages">
+                            <div class="chat-message coach-message">
+                                <strong>Coach AuraFit:</strong><br>
+                                Welcome to your AI coaching terminal, Kamalesh! I have access to your active profile constraints:
+                                <ul style="margin: 8px 0 0 16px; padding: 0;">
+                                    <li>Budget Level: <strong id="chat-status-budget">Moderate</strong></li>
+                                    <li>Equipment available: <strong id="chat-status-equipment">Full Gym Access</strong></li>
+                                    <li>Kitchen equipment: <strong id="chat-status-kitchen">Induction Cooktop</strong></li>
+                                </ul>
+                                Tell me how I can adapt your workouts, meals, or grocery runs today!
+                            </div>
+                        </div>
+                        <div class="chat-input-row">
+                            <textarea id="chat-thread-input" rows="1" placeholder="Type a message or adjustment request..."></textarea>
+                            <button class="accent-btn" id="btn-chat-thread-send">
+                                <i data-lucide="send"></i>
+                                <span>Send</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics View -->
+            <section id="panel-analytics" class="panel-view">
+                <div class="layout-dual-grid">
+                    <!-- Left: Consistency and Calories charts -->
+                    <div class="analytics-left-panel flex-column-gap">
+                        <div class="content-card glass">
+                            <h3><i data-lucide="bar-chart-3" class="text-purple"></i> Daily Calories Consumed vs Burned</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="caloriesChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="content-card glass">
+                            <h3><i data-lucide="trending-up" class="text-green"></i> Estimated Monthly Savings (vs Standard Fitness Plans)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="savingsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Progress metrics logging -->
+                    <div class="analytics-right-panel flex-column-gap">
+                        <div class="content-card glass">
+                            <h3><i data-lucide="pencil-line"></i> Log Daily Stats</h3>
+                            <form id="stats-log-form" onsubmit="return false;" class="flex-column-gap">
+                                <div class="form-grid-2">
+                                    <div class="form-group">
+                                        <label for="stat-weight">Current Weight (kg)</label>
+                                        <input type="number" id="stat-weight" step="0.1" value="70">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="stat-water">Water Drunk (glasses)</label>
+                                        <input type="number" id="stat-water" min="0" max="20" value="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="stat-calories">Extra Calories Logged (kcal)</label>
+                                        <input type="number" id="stat-calories" step="50" value="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="stat-sleep">Sleep Duration (Hours)</label>
+                                        <input type="number" id="stat-sleep" min="0" max="24" step="0.5" value="7.5">
+                                    </div>
+                                </div>
+                                <button type="submit" class="accent-btn" id="btn-log-stats-submit">Log Stats</button>
+                            </form>
+                        </div>
+
+                        <!-- Progress Summary Stats -->
+                        <div class="content-card glass">
+                            <h3><i data-lucide="list-checks" class="text-yellow"></i> Student Streak Milestones</h3>
+                            <div class="milestones-list">
+                                <div class="milestone-item achieved">
+                                    <div class="milestone-icon"><i data-lucide="check-circle-2"></i></div>
+                                    <div>
+                                        <h4 class="milestone-title">Saver Standard Onboarding</h4>
+                                        <p class="milestone-desc">Set up budget restrictions and student diet profile.</p>
+                                    </div>
+                                </div>
+                                <div class="milestone-item" id="milestone-workouts">
+                                    <div class="milestone-icon"><i data-lucide="circle"></i></div>
+                                    <div>
+                                        <h4 class="milestone-title">Workout Consistency Hero</h4>
+                                        <p class="milestone-desc">Complete 3 workouts in a single week. (Active streak: <span id="milestone-workout-streak">0</span> days)</p>
+                                    </div>
+                                </div>
+                                <div class="milestone-item" id="milestone-budget">
+                                    <div class="milestone-icon"><i data-lucide="circle"></i></div>
+                                    <div>
+                                        <h4 class="milestone-title">Smart Budget Saver</h4>
+                                        <p class="milestone-desc">Spend less than ₹150 on logged meals in a single day.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Toast System -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Main JavaScript Logic File -->
+    <script src="app.js"></script>
+</body>
+</html>

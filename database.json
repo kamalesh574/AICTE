@@ -1,0 +1,119 @@
+{
+    "users": {
+        "default_user": {
+            "id": "default_user",
+            "profile": {
+                "activity": "lightly-active",
+                "age": 20,
+                "allergies": "",
+                "budget": "budget-moderate",
+                "cuisine": "indian-veg",
+                "equipment": "full-gym",
+                "gender": "male",
+                "goal": "lean-muscle",
+                "height": 175,
+                "kitchen": "shared-kitchen",
+                "name": "Kamalesh",
+                "time": "30-min",
+                "weight": 70
+            },
+            "onboarded": true,
+            "currentTab": "dashboard",
+            "meals": [
+                {
+                    "cals": 400,
+                    "carbs": 40,
+                    "completed": false,
+                    "fats": 13,
+                    "ingredients": "AI Recommended Ingredients",
+                    "prep": "Check with AI Coach for instructions",
+                    "protein": 15,
+                    "title": "AI Selected: Eggs, Soy chunks, cheap bulk protein.",
+                    "type": "Breakfast"
+                },
+                {
+                    "cals": 300,
+                    "carbs": 30,
+                    "completed": false,
+                    "fats": 10,
+                    "ingredients": "AI Recommended Ingredients",
+                    "prep": "Check with AI Coach for instructions",
+                    "protein": 30,
+                    "title": "Recovery Meal",
+                    "type": "Dinner"
+                },
+                {
+                    "cals": 600,
+                    "carbs": 60,
+                    "completed": false,
+                    "fats": 20,
+                    "ingredients": "AI Recommended Ingredients",
+                    "prep": "Check with AI Coach for instructions",
+                    "protein": 25,
+                    "title": "Standard Balanced Meal",
+                    "type": "Lunch"
+                }
+            ],
+            "workout": [
+                {
+                    "completed": false,
+                    "name": "Dorm Room Beast",
+                    "reps": "AI Model Prediction",
+                    "target": "AI Target"
+                },
+                {
+                    "completed": false,
+                    "name": "Heavy Machine Work",
+                    "reps": "Standard rep range",
+                    "target": "AI Target"
+                },
+                {
+                    "completed": false,
+                    "name": "Free Weights",
+                    "reps": "Standard rep range",
+                    "target": "AI Target"
+                }
+            ],
+            "groceryList": [
+                {
+                    "category": "Carbs",
+                    "checked": false,
+                    "cost": 160,
+                    "name": "Rolled Oats (1kg)"
+                },
+                {
+                    "category": "Protein",
+                    "checked": false,
+                    "cost": 220,
+                    "name": "Low Fat Paneer (500g)"
+                },
+                {
+                    "category": "Protein",
+                    "checked": false,
+                    "cost": 84,
+                    "name": "Eggs (1 dozen)"
+                }
+            ],
+            "chatHistory": [],
+            "waterIntake": 0,
+            "dailyWeightLogs": [
+                71.2,
+                70.8,
+                70.6,
+                70.3,
+                70.1,
+                70
+            ],
+            "dailyCalorieLogs": [
+                1950,
+                2100,
+                2050,
+                2200,
+                1800,
+                2000
+            ],
+            "activeStreak": 3,
+            "voiceGuidance": true
+        }
+    }
+}
